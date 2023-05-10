@@ -1,5 +1,7 @@
+import threading
+
 import tkinter
-from tkinter import filedialog, NW
+from tkinter import filedialog, NW, messagebox
 
 from PIL import Image, ImageTk
 
@@ -10,10 +12,14 @@ from Geometry.Point import Point
 from Utils.ClosedAreaFinder import ClosedAreaFinder
 from Utils.DrawingUtils import DrawingUtils
 
+from ThreadingTask.Task import Task
+
 
 class Application(tkinter.Frame):
     def __init__(self, master=None):
         super().__init__(master)
+        self.task_select_contur = None
+        self.thread = None
         self.pil_image = None
         self.canvas = None
         self.drawing_utils = None
@@ -51,6 +57,8 @@ class Application(tkinter.Frame):
         self.drawing_utils = DrawingUtils(canvas=self.canvas)
         self.closed_area_finder = ClosedAreaFinder()
 
+        self.task_select_contur = Task(SelectContur.select_contur)
+
     def select_image(self):
         self.image_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg;*.png;*.jpeg")])
         if self.image_path:
@@ -58,6 +66,7 @@ class Application(tkinter.Frame):
                                                                  self.master.winfo_screenheight()))
             self.image = ImageTk.PhotoImage(self.pil_image)
             self.canvas.create_image(0, 0, image=self.image, anchor=NW)
+            self.clear_all()
 
     def start_select_area(self, event):
         if self.closed_area_finder.closed_area:
@@ -101,5 +110,18 @@ class Application(tkinter.Frame):
         self.closed_area_finder.remove_all_points()
 
     def select_contur(self):
-        if self.image_path and self.closed_area_finder.closed_area:
-            SelectContur.convert_to_binary(self.pil_image, "result.jpg", self.closed_area_finder.points)
+        if not self.image_path:
+            messagebox.showinfo("Внимание", "Не выбрано изображение")
+            return
+
+        if not self.closed_area_finder.closed_area:
+            messagebox.showinfo("Внимание", "Не выбран контур")
+            return
+
+        if self.task_select_contur.is_work:
+            messagebox.showinfo("Внимание", "Уже запущено выделение контура")
+            return
+
+        self.thread = threading.Thread(target=self.task_select_contur.execute,
+                                       args=(self.pil_image.copy(), self.closed_area_finder.points))
+        self.thread.start()

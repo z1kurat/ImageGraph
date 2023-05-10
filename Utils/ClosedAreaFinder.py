@@ -9,6 +9,9 @@ class ClosedAreaFinder:
         self.closed_area = False
 
     def add_point(self, point: Point):
+        if self.contains(point):
+            return
+
         if self.is_closed_area(point):
             self.closed_area = True
             self.points.append(self.start_point)
@@ -19,8 +22,14 @@ class ClosedAreaFinder:
 
         self.points.append(point)
 
+    def contains(self, point: Point) -> bool:
+        return any(point.equals(other_point) for other_point in self.points)
+
     def is_closed_area(self, point: Point) -> bool:
         if self.start_point is None:
+            return False
+
+        if len(self.points) < 3:
             return False
 
         distance = Point.distance_with_points(self.start_point, point)

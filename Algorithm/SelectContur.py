@@ -1,63 +1,61 @@
-import cv2
-
-import numpy as np
-
-import matplotlib.path as mpl_path
-
 from Geometry.Point import Point
-from Geometry.Rectangle import Rectangle
+
+from Utils.BoundingBoxCreater import BoundingBox
+
+from Utils.ClosedAreaDetector import ClosedAreaDetector
+
+from Utils.Constant import MAX_R
+from Utils.Constant import MAX_G
+from Utils.Constant import MAX_B
+
+from Utils.Constant import FILE_NAME
 
 
-def get_bounding_box(points):
-    min_x, min_y = float('inf'), float('inf')
-    max_x, max_y = float('-inf'), float('-inf')
-
-    for point in points:
-        if point.x > max_x:
-            max_x = point.x
-        if point.x < min_x:
-            min_x = point.x
-        if point.y > max_y:
-            max_y = point.y
-        if point.y < min_y:
-            min_y = point.y
-
-    return Rectangle(min_x, min_y, max_x, max_y)
+def select_contur(image, points):
+    binary_image = convert_to_binary(image, points)
+    graph_conversion(binary_image)
 
 
-def convert_to_array(points):
-    coords = [(point.x, point.y) for point in points]
-    return coords
+def graph_conversion(binary_image):
+    #!toDO: pass your code here
+
+    # to consider the meaning of the image
+    # width, height = binary_image.size
+    #     for x in range(width):
+    #         for y in range(height):
+    #           r, g, b = binary_image.getpixel((x, y))
+    #           your code
+
+    pass
 
 
-def convert_to_binary(image, file_name, points, max_r=180, max_g=180, max_b=180):
+def convert_to_binary(image, points):
     width, height = image.size
-    bounding_box = get_bounding_box(points)
-    closed_area = mpl_path.Path(np.array(convert_to_array(points)))
+
+    white = (255, 255, 255)
+    black = (0, 0, 0)
+
+    bounding_box = BoundingBox(points)
+    closed_area_detector = ClosedAreaDetector(points)
 
     for x in range(width):
         for y in range(height):
             if not bounding_box.contains(Point(x, y)):
-                image.putpixel((x, y), (255, 255, 255))
+                image.putpixel((x, y), white)
                 continue
 
             r, g, b = image.getpixel((x, y))
-            if not (r < max_r and g < max_g and b < max_b):
-                image.putpixel((x, y), (255, 255, 255))
+            if not (r < MAX_R and g < MAX_G and b < MAX_B):
+                image.putpixel((x, y), white)
                 continue
 
-            if not closed_area.contains_point((x, y)):
-                image.putpixel((x, y), (255, 255, 255))
+            if not closed_area_detector.contains((x, y)):
+                image.putpixel((x, y), white)
                 continue
 
-            image.putpixel((x, y), (0, 0, 0))
+            image.putpixel((x, y), black)
 
-    image.save(file_name)
+    # Debug save image
+    image.save(FILE_NAME)
 
-
-def create_graph(image):
-    bit_graph = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    contours, hierarchy = cv2.findContours(bit_graph, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    cv2.drawContours(bit_graph, contours, -1, (255, 0, 0), 3)
-    cv2.imshow("Image", bit_graph)
+    return image
