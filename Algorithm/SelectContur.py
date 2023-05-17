@@ -55,7 +55,6 @@ def convert_to_binary(image, points):
 
             image.putpixel((x, y), black)
 
-    # Debug save image
     image.save(FILE_NAME)
 
     return image
