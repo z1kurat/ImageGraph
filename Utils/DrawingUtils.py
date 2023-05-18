@@ -2,9 +2,9 @@ from tkinter import Canvas
 
 from Geometry.Point import Point
 
-from Utils.Constant import COLOR_LINE
-from Utils.Constant import COLOR_RECTANGLE
-from Utils.Constant import WIDTH_LINE
+from Parameters.Constant import COLOR_LINE
+from Parameters.Constant import COLOR_RECTANGLE
+from Parameters.Constant import WIDTH_LINE
 
 
 class DrawingUtils:

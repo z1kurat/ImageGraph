@@ -3,10 +3,10 @@ from Geometry.Rectangle import Rectangle
 
 class BoundingBox:
     def __init__(self, points):
-        self.bounding_box = self.create_bounding_box(points)
+        self.rectangle = self.create_bounding_box(points)
 
     def contains(self, point) -> bool:
-        return self.bounding_box.contains(point)
+        return self.rectangle.contains(point)
 
     @staticmethod
     def create_bounding_box(points):

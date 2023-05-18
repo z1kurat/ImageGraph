@@ -1,5 +1,5 @@
 from Geometry.Point import Point
-from Utils.Constant import TOLERANCE
+from Parameters.Constant import TOLERANCE
 
 
 class ClosedAreaFinder:

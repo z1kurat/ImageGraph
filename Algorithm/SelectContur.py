@@ -4,39 +4,34 @@ from Utils.BoundingBoxCreater import BoundingBox
 
 from Utils.ClosedAreaDetector import ClosedAreaDetector
 
-from Utils.Constant import MAX_R
-from Utils.Constant import MAX_G
-from Utils.Constant import MAX_B
+from Parameters.Constant import MAX_R
+from Parameters.Constant import MAX_G
+from Parameters.Constant import MAX_B
 
-from Utils.Constant import FILE_NAME
-
-
-def select_contur(image, points):
-    binary_image = convert_to_binary(image, points)
-    graph_conversion(binary_image)
+from Parameters.Constant import FILE_NAME
 
 
-def graph_conversion(binary_image):
+def render_graph(binary_image, rectangle, speed):
     #!toDO: pass your code here
 
     # to consider the meaning of the image
-    # width, height = binary_image.size
+    # width, height = new_pill_image.size
     #     for x in range(width):
     #         for y in range(height):
-    #           r, g, b = binary_image.getpixel((x, y))
+    #           r, g, b = new_pill_image.getpixel((x, y))
     #           your code
 
     pass
 
 
 def convert_to_binary(image, points):
-    width, height = image.size
-
     white = (255, 255, 255)
     black = (0, 0, 0)
 
     bounding_box = BoundingBox(points)
     closed_area_detector = ClosedAreaDetector(points)
+
+    width, height = image.size
 
     for x in range(width):
         for y in range(height):
@@ -54,6 +49,9 @@ def convert_to_binary(image, points):
                 continue
 
             image.putpixel((x, y), black)
+
+    image = image.crop((bounding_box.rectangle.x1, bounding_box.rectangle.y1,
+                       bounding_box.rectangle.x2, bounding_box.rectangle.y2))
 
     image.save(FILE_NAME)
 
