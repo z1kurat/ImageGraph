@@ -164,6 +164,8 @@ class Application(tkinter.Frame):
         self.canvas.bind("<B1-Motion>", self.draw_sub_scaling)
         self.canvas.bind("<ButtonRelease-1>", self.end_scaling)
 
+        self.canvas.unbind("<Button-3>")
+
     def start_scaling(self, event):
         self.start_scaling_rectangle = Point(event.x, event.y)
 
@@ -190,6 +192,8 @@ class Application(tkinter.Frame):
         self.canvas.bind("<Button-1>", self.start_selecting)
         self.canvas.bind("<B1-Motion>", self.draw_sub_selecting)
         self.canvas.bind("<ButtonRelease-1>", self.end_selecting)
+
+        self.canvas.unbind("<Button-3>")
 
     def start_selecting(self, event):
         if self.closed_area_finder.closed_area:
@@ -230,18 +234,26 @@ class Application(tkinter.Frame):
 
         self.clear_all()
 
-        self.canvas.bind("<Button-1>", self.start_recovering)
-        self.canvas.bind("<B1-Motion>", self.draw_sub_recovering)
-        self.canvas.bind("<ButtonRelease-1>", self.end_recovering)
+        self.canvas.bind("<Button-1>", self.start_recovering_draw)
+        self.canvas.bind("<B1-Motion>", self.draw_sub_recovering_draw)
+        self.canvas.bind("<ButtonRelease-1>", self.end_recovering_draw)
 
-    def start_recovering(self, event):
+        self.canvas.bind("<Button-3>", self.start_recovering_erase)
+
+    def start_recovering_erase(self, event):
+        draw = ImageDraw.Draw(self.pil_image)
+        draw.ellipse((event.x - 10, event.y - 10, event.x + 10, event.y + 10), fill=(255, 255, 255))
+        self.pil_image.save(FILE_NAME)
+        self.update_image(FILE_NAME, False)
+
+    def start_recovering_draw(self, event):
         self.start_recovering_point = Point(event.x, event.y)
 
-    def draw_sub_recovering(self, event):
+    def draw_sub_recovering_draw(self, event):
         self.drawing_utils.remove_last_object()
         self.drawing_utils.draw_line(self.start_recovering_point, Point(event.x, event.y))
 
-    def end_recovering(self, event):
+    def end_recovering_draw(self, event):
         self.drawing_utils.remove_last_object()
 
         draw = ImageDraw.Draw(self.pil_image)

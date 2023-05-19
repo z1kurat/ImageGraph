@@ -9,4 +9,5 @@ root.attributes("-fullscreen", False)
 
 app = Application(master=root)
 
+
 app.mainloop()
