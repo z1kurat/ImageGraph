@@ -165,6 +165,8 @@ class Application(tkinter.Frame):
         self.canvas.bind("<ButtonRelease-1>", self.end_scaling)
 
         self.canvas.unbind("<Button-3>")
+        self.canvas.unbind("<B3-Motion>")
+        self.canvas.unbind("<ButtonRelease-3>")
 
     def start_scaling(self, event):
         self.start_scaling_rectangle = Point(event.x, event.y)
@@ -194,6 +196,8 @@ class Application(tkinter.Frame):
         self.canvas.bind("<ButtonRelease-1>", self.end_selecting)
 
         self.canvas.unbind("<Button-3>")
+        self.canvas.unbind("<B3-Motion>")
+        self.canvas.unbind("<ButtonRelease-3>")
 
     def start_selecting(self, event):
         if self.closed_area_finder.closed_area:
@@ -238,13 +242,23 @@ class Application(tkinter.Frame):
         self.canvas.bind("<B1-Motion>", self.draw_sub_recovering_draw)
         self.canvas.bind("<ButtonRelease-1>", self.end_recovering_draw)
 
-        self.canvas.bind("<Button-3>", self.start_recovering_erase)
+        self.canvas.bind("<Button-3>", self.recovering_erase)
+        self.canvas.bind("<B3-Motion>", self.recovering_erase)
+        self.canvas.bind("<ButtonRelease-3>", self.recovering_erase_end)
 
-    def start_recovering_erase(self, event):
+    def erase(self, point):
         draw = ImageDraw.Draw(self.pil_image)
-        draw.ellipse((event.x - 10, event.y - 10, event.x + 10, event.y + 10), fill=(255, 255, 255))
+        draw.ellipse((point.x - 10, point.y - 10, point.x + 10, point.y + 10), fill=(255, 255, 255))
         self.pil_image.save(FILE_NAME)
         self.update_image(FILE_NAME, False)
+
+    def recovering_erase(self, event):
+        self.drawing_utils.remove_last_object()
+        self.erase(Point(event.x, event.y))
+        self.drawing_utils.draw_ellipse(Point(event.x, event.y))
+
+    def recovering_erase_end(self, event):
+        self.drawing_utils.remove_last_object()
 
     def start_recovering_draw(self, event):
         self.start_recovering_point = Point(event.x, event.y)

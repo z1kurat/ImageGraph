@@ -11,15 +11,33 @@ from Parameters.Constant import MAX_B
 from Parameters.Constant import FILE_NAME
 
 
+def convert_to_array(binary_image):
+    width, height = binary_image.size
+    black = (0, 0, 0)
+    result = [[]]
+
+    for x in range(width):
+        for y in range(height):
+            if binary_image.getpixel((x, y)) == black:
+                result[x][y] = 1
+            else:
+                result[x][y] = 0
+
+    return result
+
+
 def render_graph(binary_image, rectangle, speed):
     #!toDO: pass your code here
 
     # to consider the meaning of the image
-    # width, height = new_pill_image.size
+    # width, height = binary_image.size
     #     for x in range(width):
     #         for y in range(height):
     #           r, g, b = new_pill_image.getpixel((x, y))
     #           your code
+    #
+    # array = convert_to_array(binary_image)
+    # rectangle = left down and right top
 
     pass
 
